@@ -14,8 +14,10 @@
     }
 </style>
 <head>
-<title>ZooBC</title>
-<img src="zoobc.png">
+<link rel="icon" href="favicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+<title>ZooBC - Order Details</title>
+<a href = zoobc.html><img src="zoobc.png"></a>
 </head>
 <hr>
 <body>

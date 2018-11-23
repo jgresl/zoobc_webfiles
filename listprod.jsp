@@ -10,46 +10,76 @@
 }
 </style>
 <head>
-<link rel="icon" href="favicon.ico" type="image/x-icon"/>
-<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
-<title>ZooBC</title>
-<img src="zoobc.png">
+<link rel="icon" href="favicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+<title>ZooBC - Animal List</title>
+<a href = zoobc.html><img src="zoobc.png"></a>
 </head>
 <hr>
 <body>
-
-
-	<h2>Browse Products By Category and Search by Product Name:</h2>
+	<h2>Search for animals by name. Browse animals by classification, size, and price:</h2>
 
 	<form method="get" action="listprod.jsp">
 		<p align="left">
-			<select size="1" name="categoryName">
-				<option>All</option>
-				<option>Beverages</option>
-				<option>Condiments</option>
-				<option>Confections</option>
-				<option>Dairy Products</option>
-				<option>Grains/Cereals</option>
-				<option>Meat/Poultry</option>
-				<option>Produce</option>
-				<option>Seafood</option>
-
-				<input type="text" name="productName" size="30">
-			</select><input type="submit" value="Submit"><input type="reset"
-				value="Reset">
+			<input type="text" name="name"size="35"></input>
+			&nbsp&nbsp&nbsp&nbsp&nbsp 
+			<select size="1" name="classification">
+				<option>All Classifications</option>
+				<option>Amphibians</option>
+				<option>Birds</option>
+				<option>Fish</option>
+				<option>Mammals</option>
+				<option>Reptiles</option>
+			</select>
+			&nbsp&nbsp&nbsp&nbsp&nbsp 
+			<select size="1" name="size">
+				<option>All Sizes</option>
+				<option>Tiny</option>
+				<option>Small</option>
+				<option>Medium</option>
+				<option>Large</option>
+				<option>Giant</option>
+			</select>
+			&nbsp&nbsp&nbsp&nbsp&nbsp 
+			<select size="1" name="price">
+				<option>All Prices</option>
+				<option>Less than $5000</option>
+				<option>Less than $1000</option>
+				<option>Less than $500</option>
+				<option>Less than $100</option>
+			</select>
+			&nbsp&nbsp&nbsp&nbsp&nbsp 
+			<input type="submit" value="Submit"></input>
 		</p>
 	</form>
 
-	<%
+	<%		// Get classification to search for
+			String classification = request.getParameter("classification");
+			if (classification == null || classification.equals("All Classifications"))
+			classification = "%";
+			
+			// Get size to search for
+			String size = request.getParameter("size");
+			if (size == null || size.equals("All Sizes"))
+			size = "%";
+					
+			// Get price to search for
+			String price = request.getParameter("price");
+			if (price == null || price.equals("All Prices"))
+				price = "100000";
+			else if(price.equals("Less than $5000"))
+				price = "5000";
+			else if(price.equals("Less than $1000"))
+				price = "1000";
+			else if(price.equals("Less than $500"))
+				price = "500";
+			else if(price.equals("Less than $100"))
+				price = "100";
+			
 		// Get product name to search for
-		String name = request.getParameter("productName");
+		String name = request.getParameter("name");
 		if (name == null)
-			name = '%' + "";
-
-		// Get category name to search for
-		String category = request.getParameter("categoryName");
-		if (category == null || category.equals("All"))
-			category = '%' + "";
+			name = "%";
 
 		//Note: Forces loading of SQL Server driver
 		try { // Load driver class
@@ -57,9 +87,6 @@
 		} catch (java.lang.ClassNotFoundException e) {
 			out.println("ClassNotFoundException: " + e);
 		}
-
-		// Variable name now contains the search string the user entered
-		// Use it to build a query and print out the resultset.  Make sure to use PreparedStatement!
 
 		// Make the connection
 		String url = "jdbc:sqlserver://sql04.ok.ubc.ca:1433;DatabaseName=db_jgresl;";
@@ -72,53 +99,55 @@
 		try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 
 			// Write query to retrieve all order headers
-			String sql = "SELECT productId, productName, categoryName, price FROM Product WHERE productName LIKE ? AND categoryName LIKE ?";
+			String sql = "SELECT animal_ID, animalName, animalClass, animalType, animalSize, animalPrice FROM Animal WHERE animalClass LIKE ? AND animalSize LIKE ? AND animalPrice < ? AND animalName LIKE ?";
 			PreparedStatement pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, "%" + name + "%");
-			pstmt.setString(2, category);
+			pstmt.setString(1, classification);
+			pstmt.setString(2, size);
+			pstmt.setString(3, price);
+			pstmt.setString(4, "%" + name + "%");
 			ResultSet rst = pstmt.executeQuery();
 
 			// Determine what header title to print
 			String resultString;
-			if (category == '%' + "" && (name == "%" || name == ""))
-				resultString = "All Products";
-			else if (category.length() > 3 && name == "")
-				resultString = "Products in category '" + category + "'";
-			else if (category.length() > 3 && name != "")
-				resultString = "Products in category '" + category + "' containing '" + name + "'";
-			else
-				resultString = "All Products containing '" + name + "'";
+			if (classification == "%" && size == "%" && price == "100000" && name == "%")
+				resultString = "All Animals";
+			else {
+				String parameterName = request.getParameter("name") == "" ? "All Names" : request.getParameter("name");
+				resultString = "Animals with [<font color=\"teal\">Name: </font>" + parameterName + "<font color=\"teal\">&nbsp&nbsp&nbspClassification: </font>" + request.getParameter("classification") + "<font color=\"teal\">&nbsp&nbsp&nbspSize: </font>" + request.getParameter("size") + "<font color=\"teal\">&nbsp&nbsp&nbspPrice: </font>" + request.getParameter("price") + "]";
+			}
+			out.println(resultString + "<br><br>");
 
 			// Print out the ResultSet
-			out.println("<h1>" + resultString + "</h1>");
-			out.println(
-					"<table ><tr><th col width=\"150\"></th><th col width=\"300\" align=\"left\"><font color=\"b60009\">Product Name&nbsp&nbsp&nbsp&nbsp&nbsp<img src=\"arrows.png\"></th><th col width=\"200\" align=\"left\"><font color=\"b60009\">Category&nbsp&nbsp&nbsp&nbsp&nbsp<img src=\"arrows.png\"></th><th align=\"left\"><font color=\"b60009\">Price&nbsp&nbsp&nbsp&nbsp&nbsp<img src=\"arrows.png\"></th></tr>");
+			out.println("<table><tr>"
+					+ "<th col width=\"125\"></th>"
+					+ "<th col width=\"175\" align=\"left\">	<font color=\"teal\">Name  			&nbsp&nbsp <img src=\"arrows.png\"></th>"
+					+ "<th col width=\"150\" align=\"left\">	<font color=\"teal\">Classification &nbsp&nbsp <img src=\"arrows.png\"></th>"
+					+ "<th col width=\"100\" align=\"left\">	<font color=\"teal\">Type  			&nbsp&nbsp <img src=\"arrows.png\"></th>"
+					+ "<th col width=\"100\" align=\"left\">	<font color=\"teal\">Size  			&nbsp&nbsp <img src=\"arrows.png\"></th>"
+					+ "<th col width=\"100\" align=\"left\">	<font color=\"teal\">Price  		&nbsp&nbsp <img src=\"arrows.png\"></th>"
+					+ "</tr>");
 
 			while (rst.next()) {
-				out.print("<tr><i>");
+				out.print("<tr>");
 
-				// For each product create a link of the form addcart.jsp?id=<productId>&name=<productName>&price=<productPrice>
-				// Note: As some product names contain special characters, need to encode URL parameter for product name like this: URLEncoder.encode(productName, "Windows-1252")
-				out.print("<td>");
-				out.print("<a href = \"addcart.jsp?id=" + rst.getInt("productId") + "&name="
-						+ URLEncoder.encode(rst.getString("productName"), "Windows-1252") + "&price="
-						+ rst.getDouble("price") + "\">Add to Cart</a>");
-				out.print("</td>");
+				// For each animal create a link of the form addcart.jsp
+				out.print("<td><a href = \"addcart.jsp?" + 
+					"id=" + rst.getInt("animal_ID") + 
+					"&class=" + rst.getString("animalClass") +
+					"&size=" + rst.getString("animalSize") + 
+					"&price=" + rst.getDouble("animalPrice") +
+					"&name=" + rst.getString("animalName") + 
+					"\">Add to Cart</a></td>");
 
-				out.print("<td>");
-				out.print(rst.getString("productName"));
-				out.print("</td>");
-
-				out.print("<td>");
-				out.print(rst.getString("categoryName"));
-				out.print("</td>");
-
-				out.print("<td align=\"left\">");
-				out.print(currFormat.format(rst.getDouble("price")));
-				out.print("</td>");
-
-				out.println("</i></tr>");
+				// Print search results
+				out.print("<td>" + rst.getString("animalName") + "</td>");
+				out.print("<td>" + rst.getString("animalClass") + "</td>");
+				out.print("<td>" + rst.getString("animalType") + "</td>");
+				out.print("<td>" + rst.getString("animalSize") + "</td>");
+				out.print("<td align=\"left\">" + currFormat.format(rst.getDouble("animalPrice")) + "</td>");
+				out.println("</tr>");
 			}
+			//out.println("</table>");
 
 			// Close connection through try-with-resources
 

@@ -13,8 +13,10 @@
 }
 </style>
 <head>
-<title>ZooBC</title>
-<img src="zoobc.png">
+<link rel="icon" href="favicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+<title>ZooBC - Shopping Cart</title>
+<a href = zoobc.html><img src="zoobc.png"></a>
 </head>
 <hr>
 <body>
@@ -39,7 +41,6 @@
 			out.println("<form name=\"form1\">");
 
 			// Get new parameters for update
-
 			try {
 				String id = request.getParameter("update");
 				String qty = request.getParameter("newqty");
@@ -56,9 +57,11 @@
 
 			out.println("<h1>Your Shopping Cart</h1>");
 			out.print(
-					"<table><tr><th col width=\"100\" align=\"left\"><font color=\"b60009\">Product Id</th><th col width=\"300\" align=\"left\"><font color=\"b60009\">Product Name</th><th col width=\"75\" align=\"left\"><font color=\"b60009\">Quantity</th>");
-			out.println(
-					"<th col width=\"100\" align=\"right\"><font color=\"b60009\">Price</th><th col width=\"100\" align=\"right\"><font color=\"b60009\">Subtotal</th></tr>");
+					"<table><tr><th col width=\"100\" align=\"left\"><font color=\"teal\">Product Id</th>" +
+					"<th col width=\"200\" align=\"left\"><font color=\"teal\">Product Name</th>" +
+					"<th col width=\"125\" align=\"left\"><font color=\"teal\">Quantity</th>" +
+					"<th col width=\"100\" align=\"right\"><font color=\"teal\">Price</th>" +
+					"<th col width=\"100\" align=\"right\"><font color=\"teal\">Subtotal</th></tr>");
 
 			double total = 0;
 			int row = 1;
@@ -73,8 +76,7 @@
 
 				out.print("<tr><td>" + product.get(0) + "</td>");
 				out.print("<td>" + product.get(1) + "</td>");
-				out.print("<td><input type=\"text\" name=\"newqty" + row + "\" size=\"3\" value=\"" + product.get(3)
-						+ "\"></td>");
+				out.print("<td><input type=\"text\" name=\"newqty" + row + "\" size=\"3\" value=\"" + product.get(3) + "\"><input type=button OnClick=\"update(" + product.get(0) + ", document.form1.newqty" + row + ".value)\" value=\"Update\"</td>");
 
 				Object price = product.get(2);
 				Object itemqty = product.get(3);
@@ -93,17 +95,13 @@
 				}
 
 				out.print("<td align=\"right\">" + currFormat.format(pr) + "</td>");
-				out.print("<td align=\"right\">" + currFormat.format(pr * qty)
-						+ "</td><td>&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"showcart.jsp?delete=" + product.get(0)
-						+ "\">Remove Item from Cart</a></td><td>&nbsp;&nbsp;&nbsp;&nbsp;<input type=button OnClick=\"update("
-						+ product.get(0) + ", document.form1.newqty" + row + ".value)\" value=\"Update Quantity\""
-						+ "</td></tr>");
-				out.println("</tr>");
+				out.print("<td align=\"right\">" + currFormat.format(pr * qty) + "</td><td>&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"showcart.jsp?delete=" + product.get(0) + "\">Remove Item from Cart</a></td></tr>");
+						
+
 				total = total + pr * qty;
 				row += 1;
 			}
-			out.println("<tr><td colspan=\"4\" align=\"right\"><b><font color=\"b60009\">Order Total</b></td>"
-					+ "<td align=\"right\"><font color=\"b60009\">" + currFormat.format(total) + "</td></tr>");
+			out.println("<tr><td colspan=\"4\" align=\"right\"><b><font color=\"teal\">Order Total</b></td><td align=\"right\"><font color=\"teal\">" + currFormat.format(total) + "</td></tr>");
 			out.println("</table>");
 
 			out.println("<h2><a href=\"checkout.jsp\">Check Out</a></h2>");
