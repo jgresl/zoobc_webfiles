@@ -6,18 +6,39 @@
 <style>
 * {
 	font-family: Calibri;
-	font-weight: bold
+	font-weight: bold;
+	white-space:nowrap;
+}
+
+a:link, a:active, a:visited {
+	color: navy;
+	text-decoration: none;
+}
+
+a:hover {
+	color: teal;
+	text-decoration: none;
 }
 </style>
 <head>
 <link rel="icon" href="favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-<title>ZooBC - Animal List</title>
-<a href = zoobc.html><img src="zoobc.png"></a>
+<title>ZooBC - Home</title>
+
+<table width="100%">
+	<tr>
+		<th align="left"><a href=zoobc.html><img src="zoobc.png"></th>
+		<th col width="200" align="right"><a href=zoobc.html><h2>HOME</h2></a></th>
+		<th col width="200" align="right"><a href=listprod.jsp><h2>ANIMALS</h2></a></th>
+		<th col width="200" align="right"><a href=zoobc.html><h2>REGISTER</h2></a></th>
+		<th col width="200" align="right"><a href=checkout.jsp><h2>SIGN IN</h2></a></th>
+		<th col width="300" align="right"><a href=showcart.jsp><h2>SHOPPING CART</h2></a></th>
+	</tr>
+</table>
 </head>
-<hr>
+<hr size=10 color="navy">
 <body>
-	<h2>Search for animals by name. Browse animals by classification, size, and price:</h2>
+	<h2>Search for animals by name. Filter animals by classification, type, size, and price:</h2>
 
 	<form method="get" action="listprod.jsp">
 		<p align="left">
@@ -30,6 +51,14 @@
 				<option>Fish</option>
 				<option>Mammals</option>
 				<option>Reptiles</option>
+			</select>
+			&nbsp&nbsp&nbsp&nbsp&nbsp 
+			<select size="1" name="type">
+				<option>All Types</option>
+				<option>Frogs</option>
+				<option>Bears</option>
+				<option>AJAX?</option>
+				<option>SELECT SQL?</option>
 			</select>
 			&nbsp&nbsp&nbsp&nbsp&nbsp 
 			<select size="1" name="size">
@@ -50,6 +79,8 @@
 			</select>
 			&nbsp&nbsp&nbsp&nbsp&nbsp 
 			<input type="submit" value="Submit"></input>
+			&nbsp
+			<input type="reset" value="Reset"></input>
 		</p>
 	</form>
 
@@ -58,6 +89,11 @@
 			if (classification == null || classification.equals("All Classifications"))
 			classification = "%";
 			
+			// Get classification to search for
+			String type = request.getParameter("type");
+			if (type == null || type.equals("All Types"))
+			type = "%";
+						
 			// Get size to search for
 			String size = request.getParameter("size");
 			if (size == null || size.equals("All Sizes"))
@@ -99,12 +135,13 @@
 		try (Connection con = DriverManager.getConnection(url, uid, pw)) {
 
 			// Write query to retrieve all order headers
-			String sql = "SELECT animal_ID, animalName, animalClass, animalType, animalSize, animalPrice FROM Animal WHERE animalClass LIKE ? AND animalSize LIKE ? AND animalPrice < ? AND animalName LIKE ?";
+			String sql = "SELECT animal_ID, animalName, animalClass, animalType, animalSize, animalPrice FROM Animal WHERE animalClass LIKE ? AND animalType LIKE ? AND animalSize LIKE ? AND animalPrice < ? AND animalName LIKE ?";
 			PreparedStatement pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, classification);
-			pstmt.setString(2, size);
-			pstmt.setString(3, price);
-			pstmt.setString(4, "%" + name + "%");
+			pstmt.setString(2, type);
+			pstmt.setString(3, size);
+			pstmt.setString(4, price);
+			pstmt.setString(5, "%" + name + "%");
 			ResultSet rst = pstmt.executeQuery();
 
 			// Determine what header title to print
@@ -113,17 +150,17 @@
 				resultString = "All Animals";
 			else {
 				String parameterName = request.getParameter("name") == "" ? "All Names" : request.getParameter("name");
-				resultString = "Animals with [<font color=\"teal\">Name: </font>" + parameterName + "<font color=\"teal\">&nbsp&nbsp&nbspClassification: </font>" + request.getParameter("classification") + "<font color=\"teal\">&nbsp&nbsp&nbspSize: </font>" + request.getParameter("size") + "<font color=\"teal\">&nbsp&nbsp&nbspPrice: </font>" + request.getParameter("price") + "]";
+				resultString = "Animals with [<font color=\"teal\">Name: </font>" + parameterName + "<font color=\"teal\">&nbsp&nbsp&nbsp&nbspClassification: </font>" + request.getParameter("classification") + "<font color=\"teal\">&nbsp&nbsp&nbsp&nbspType: </font>" + request.getParameter("type") + "<font color=\"teal\">&nbsp&nbsp&nbsp&nbspSize: </font>" + request.getParameter("size") + "<font color=\"teal\">&nbsp&nbsp&nbsp&nbspPrice: </font>" + request.getParameter("price") + "]";
 			}
 			out.println(resultString + "<br><br>");
 
 			// Print out the ResultSet
-			out.println("<table><tr>"
+			out.println("<br><table><tr>"
 					+ "<th col width=\"125\"></th>"
 					+ "<th col width=\"175\" align=\"left\">	<font color=\"teal\">Name  			&nbsp&nbsp <img src=\"arrows.png\"></th>"
-					+ "<th col width=\"150\" align=\"left\">	<font color=\"teal\">Classification &nbsp&nbsp <img src=\"arrows.png\"></th>"
-					+ "<th col width=\"100\" align=\"left\">	<font color=\"teal\">Type  			&nbsp&nbsp <img src=\"arrows.png\"></th>"
-					+ "<th col width=\"100\" align=\"left\">	<font color=\"teal\">Size  			&nbsp&nbsp <img src=\"arrows.png\"></th>"
+					+ "<th col width=\"175\" align=\"left\">	<font color=\"teal\">Classification &nbsp&nbsp <img src=\"arrows.png\"></th>"
+					+ "<th col width=\"150\" align=\"left\">	<font color=\"teal\">Type  			&nbsp&nbsp <img src=\"arrows.png\"></th>"
+					+ "<th col width=\"125\" align=\"left\">	<font color=\"teal\">Size  			&nbsp&nbsp <img src=\"arrows.png\"></th>"
 					+ "<th col width=\"100\" align=\"left\">	<font color=\"teal\">Price  		&nbsp&nbsp <img src=\"arrows.png\"></th>"
 					+ "</tr>");
 
@@ -134,6 +171,7 @@
 				out.print("<td><a href = \"addcart.jsp?" + 
 					"id=" + rst.getInt("animal_ID") + 
 					"&class=" + rst.getString("animalClass") +
+					"&type=" + rst.getString("animalType") +
 					"&size=" + rst.getString("animalSize") + 
 					"&price=" + rst.getDouble("animalPrice") +
 					"&name=" + rst.getString("animalName") + 
@@ -147,7 +185,7 @@
 				out.print("<td align=\"left\">" + currFormat.format(rst.getDouble("animalPrice")) + "</td>");
 				out.println("</tr>");
 			}
-			//out.println("</table>");
+			out.println("</table>");
 
 			// Close connection through try-with-resources
 

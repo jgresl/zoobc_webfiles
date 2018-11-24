@@ -9,16 +9,37 @@
 <style>
 * {
 	font-family: Calibri;
-	font-weight: bold
+	font-weight: bold;
+	white-space:nowrap;
+}
+
+a:link, a:active, a:visited {
+	color: navy;
+	text-decoration: none;
+}
+
+a:hover {
+	color: teal;
+	text-decoration: none;
 }
 </style>
 <head>
 <link rel="icon" href="favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-<title>ZooBC - Shopping Cart</title>
-<a href = zoobc.html><img src="zoobc.png"></a>
+<title>ZooBC - Home</title>
+
+<table width="100%">
+	<tr>
+		<th align="left"><a href=zoobc.html><img src="zoobc.png"></th>
+		<th col width="200" align="right"><a href=zoobc.html><h2>HOME</h2></a></th>
+		<th col width="200" align="right"><a href=listprod.jsp><h2>ANIMALS</h2></a></th>
+		<th col width="200" align="right"><a href=zoobc.html><h2>REGISTER</h2></a></th>
+		<th col width="200" align="right"><a href=checkout.jsp><h2>SIGN IN</h2></a></th>
+		<th col width="300" align="right"><a href=showcart.jsp><h2>SHOPPING CART</h2></a></th>
+	</tr>
+</table>
 </head>
-<hr>
+<hr size=10 color="navy">
 <body>
 	<%
 		// Get the current list of products
