@@ -1,0 +1,15 @@
+* {
+	font-family: Calibri;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+a:link, a:active, a:visited {
+	color: navy;
+	text-decoration: none;
+}
+
+a:hover {
+	color: teal;
+	text-decoration: none;
+}
